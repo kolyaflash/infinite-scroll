@@ -67,6 +67,7 @@
         appendCallback: true,
         bufferPx: 40,
         errorCallback: function () { },
+        xhrCallback: function () { },
         infid: 0, //Instance ID
         pixelsFromNavToBottom: undefined,
         dependsOnContainerEnd: false,
@@ -583,8 +584,9 @@
             switch (method) {
                 case 'html+callback':
                     instance._debug('Using HTML via .load() method');
-                    box.load(desturl + ' ' + opts.itemSelector, undefined, function infscr_ajax_callback(responseText) {
+                    box.load(desturl + ' ' + opts.itemSelector, undefined, function infscr_ajax_callback(responseText, textStatus, jqXHR) {
                         instance._loadcallback(box, responseText, desturl);
+                        opts.xhrCallback(jqXHR);
                     });
 
                     break;
@@ -599,6 +601,7 @@
                             condition = (typeof (jqXHR.isResolved) !== 'undefined') ? (jqXHR.isResolved()) : (textStatus === "success" || textStatus === "notmodified");
                             if (condition) {
                                 instance._loadcallback(box, jqXHR.responseText, desturl);
+                                opts.xhrCallback(jqXHR);
                             } else {
                                 instance._error('end');
                             }
@@ -622,6 +625,7 @@
                                     box.append(theData);
                                     if (condition) {
                                         instance._loadcallback(box, theData);
+                                        opts.xhrCallback(jqXHR);
                                     } else {
                                         instance._error('end');
                                     }
@@ -633,6 +637,7 @@
                                 // if appendCallback is false, we will pass in the JSON object. you should handle it yourself in your callback.
                                 if (condition) {
                                     instance._loadcallback(box, data, desturl);
+                                    opts.xhrCallback(jqXHR);
                                 } else {
                                     instance._error('end');
                                 }
